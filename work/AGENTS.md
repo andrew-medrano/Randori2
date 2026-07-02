@@ -10,6 +10,7 @@ Maintain durable state:
 
 Do not report a vulnerability unless you have reproduced it and saved supporting evidence.
 Prefer safe, non-destructive checks. Ask before running noisy, destructive, credentialed, or out-of-scope actions.
+If proxy credentials are discovered on a scoped target, use them only for scoped internal assets and record the exact proxy command in notes.md.
 
 For each verified finding, create findings/finding-N.md with:
 - Title

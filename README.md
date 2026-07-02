@@ -10,12 +10,12 @@ cp .env.example .env
 docker compose build opencode-kali
 ```
 
-## Run Against The Local Flag Target
+## Run Against The Local Multi-Box Target
 
-Start the deliberately small authorized lab target:
+Start the deliberately small authorized lab:
 
 ```sh
-docker compose up -d lab-target
+docker compose up -d --build lab-target lab-proxy lab-internal
 ```
 
 Launch the Kali/OpenCode container:
@@ -42,7 +42,13 @@ Use this prompt:
 Assess only this target: http://lab-target:8080. Follow scope.md. Save evidence and findings.
 ```
 
-The same target is available from the host at `http://127.0.0.1:18080`.
+The edge target is available from the host at `http://127.0.0.1:18080`.
+
+The lab has three boxes:
+
+- `lab-target:8080`: exposed edge web target
+- `lab-proxy:3128`: pivot HTTP proxy with credentials leaked by the edge target
+- `lab-internal:8081`: internal web target reachable only through the pivot proxy
 
 ## Manual Smoke Test
 
@@ -53,6 +59,13 @@ nmap -sV lab-target -p 8080 -oA evidence/nmap-initial
 ffuf -u http://lab-target:8080/FUZZ -w /usr/share/wordlists/dirb/common.txt -o evidence/ffuf.json -of json
 curl -s http://lab-target:8080/robots.txt | tee evidence/robots.txt
 curl -s http://lab-target:8080/backup/config.bak | tee evidence/flag.txt
+
+# This should fail because lab-internal is not on the assessment network.
+curl -sS --max-time 3 http://lab-internal:8081/healthz
+
+# This should work through the pivot proxy.
+curl -sS -x http://operator:windward@lab-proxy:3128 http://lab-internal:8081/healthz
+curl -sS -x http://operator:windward@lab-proxy:3128 http://lab-internal:8081/admin/flag.txt
 ```
 
 For a real engagement, edit `work/scope.md` first and keep the target list explicit.
