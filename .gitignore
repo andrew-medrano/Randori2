@@ -1,0 +1,8 @@
+.env
+
+work/evidence/*
+!work/evidence/.gitkeep
+work/findings/*
+!work/findings/.gitkeep
+
+.DS_Store

@@ -1,0 +1,24 @@
+services:
+  opencode-kali:
+    build:
+      context: .
+    image: randori2/opencode-kali:latest
+    container_name: opencode-kali
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      DISPLAY: ${DISPLAY:-}
+    volumes:
+      - ./work:/work
+    working_dir: /work
+    stdin_open: true
+    tty: true
+    command: bash
+
+  lab-target:
+    build:
+      context: ./lab-target
+    image: randori2/lab-target:latest
+    ports:
+      - "127.0.0.1:18080:8080"
